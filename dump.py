@@ -54,6 +54,11 @@ for note in note_cursor:
         
     outfile.write(etree.tostring(note_elem, encoding='utf8', pretty_print=True))
 
+    if note_cursor.rownumber % 100 == 0:
+        print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note_cursor.rowcount)
+
+print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note_cursor.rowcount)
+
 conn.close()
 
 outfile.write('</osm>\n')
