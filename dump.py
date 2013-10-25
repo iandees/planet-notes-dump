@@ -28,30 +28,45 @@ note_cursor.execute("""SELECT id,latitude,longitude,created_at,status,closed_at
                        FROM notes
                        WHERE status != 'hidden' AND updated_at > %s""", [args.since])
 for note in note_cursor:
-    note_elem = etree.Element("note", {'id': str(note[0]),
-                                       'lat': '%0.7f' % (note[1] / 10000000.),
-                                       'lon': '%0.7f' % (note[2] / 10000000.),
-                                       'status': note[4],
-                                       'created': note[3].replace(microsecond=0).isoformat() + 'Z'})
+    note_elem = etree.Element("note", {'lat': '%0.7f' % (note[1] / 10000000.),
+                                       'lon': '%0.7f' % (note[2] / 10000000.)})
+
+    id_elem = etree.SubElement(note_elem, "id")
+    id_elem.text = str(note[0])
+
+    created_elem = etree.SubElement(note_elem, "date_created")
+    note_elem.text = note[3].strftime('%Y-%m-%d %H:%M:%S UTC')
 
     if note[4] == 'closed':
-        note_elem.attrib['closed'] = note[5].replace(microsecond=0).isoformat() + 'Z'
+        closed_elem = etree.SubElement(note_elem, "date_closed")
+        closed_elem.text = note[5].strftime('%Y-%m-%d %H:%M:%S UTC')
+
+    comments_elem = etree.SubElement(note_elem, "comments")
 
     comment_cursor.execute("""SELECT created_at,author_id,users.display_name,body,event
                               FROM note_comments
                               FULL OUTER JOIN users ON (note_comments.author_id=users.id)
                               WHERE note_id = %s ORDER BY created_at""", [note[0]])
     for comment in comment_cursor:
-        comment_elem = etree.SubElement(note_elem, "comment", {'created': comment[0].replace(microsecond=0).isoformat() + 'Z',
-                                                               'action': comment[4]})
+        comment_elem = etree.SubElement(comments_elem, "comment")
+
+        comment_date_elem = etree.SubElement(comment_elem, "date")
+        comment_date_elem.text = comment[0].strftime('%Y-%m-%d %H:%M:%S UTC')
 
         if comment[1]:
-            comment_elem.attrib['uid'] = str(comment[1])
-            comment_elem.attrib['user'] = comment[2]
+            comment_uid_elem = etree.SubElement(comment_elem, "uid")
+            comment_uid_elem.text = str(comment[1])
+
+            comment_user_elem = etree.SubElement(comment_elem, "user")
+            comment_user_elem.text = comment[2]
+
+        comment_action_elem = etree.SubElement(comment_elem, "action")
+        comment_action_elem.text = comment[4]
 
         if comment[3] is not None:
-            comment_elem.text = comment[3]
-        
+            comment_text_elem = etree.SubElement(comment_elem, "text")
+            comment_text_elem.text = comment[3]
+
     outfile.write(etree.tostring(note_elem, encoding='utf8', pretty_print=True))
 
     if note_cursor.rownumber % 100 == 0:
