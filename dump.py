@@ -35,7 +35,7 @@ for note in note_cursor:
     id_elem.text = str(note[0])
 
     created_elem = etree.SubElement(note_elem, "date_created")
-    note_elem.text = note[3].strftime('%Y-%m-%d %H:%M:%S UTC')
+    created_elem.text = note[3].strftime('%Y-%m-%d %H:%M:%S UTC')
 
     if note[4] == 'closed':
         closed_elem = etree.SubElement(note_elem, "date_closed")
