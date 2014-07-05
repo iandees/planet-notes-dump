@@ -23,7 +23,7 @@ Running
 -------
 
     # Use your virtualenv
-    use planet-notes-dump
+    workon planet-notes-dump
 
     # Execute the initial dump
     python dump.py --database openstreetmap --username foo notes_dump.xml
