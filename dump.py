@@ -26,7 +26,8 @@ comment_cursor = conn.cursor()
 
 note_cursor.execute("""SELECT id,latitude,longitude,created_at,status,closed_at
                        FROM notes
-                       WHERE status != 'hidden' AND updated_at > %s""", [args.since])
+                       WHERE status != 'hidden' AND updated_at > %s
+                       ORDER BY id ASC""", [args.since])
 for note in note_cursor:
     note_elem = etree.Element("note", {
         'lat': '%0.7f' % (note[1] / 10000000.),
