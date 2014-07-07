@@ -39,14 +39,12 @@ for note in note_cursor:
     if note[4] == 'closed':
         note_elem.set('date_closed', note[5].strftime('%Y-%m-%dT%H:%M:%SZ'))
 
-    comments_elem = etree.SubElement(note_elem, "comments")
-
     comment_cursor.execute("""SELECT created_at,author_id,users.display_name,body,event
                               FROM note_comments
                               FULL OUTER JOIN users ON (note_comments.author_id=users.id)
                               WHERE note_id = %s ORDER BY created_at""", [note[0]])
     for comment in comment_cursor:
-        comment_elem = etree.SubElement(comments_elem, "comment", {
+        comment_elem = etree.SubElement(note_elem, "comment", {
             'date': comment[0].strftime('%Y-%m-%dT%H:%M:%SZ'),
             'action': comment[4],
         })
