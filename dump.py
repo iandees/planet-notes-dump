@@ -33,11 +33,11 @@ for note in note_cursor:
         'lat': '%0.7f' % (note[1] / 10000000.),
         'lon': '%0.7f' % (note[2] / 10000000.),
         'id': str(note[0]),
-        'date_created': note[3].strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'created_at': note[3].strftime('%Y-%m-%dT%H:%M:%SZ'),
     })
 
     if note[4] == 'closed':
-        note_elem.set('date_closed', note[5].strftime('%Y-%m-%dT%H:%M:%SZ'))
+        note_elem.set('closed_at', note[5].strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     comment_cursor.execute("""SELECT created_at,author_id,users.display_name,body,event
                               FROM note_comments
