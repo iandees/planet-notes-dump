@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 outfile = file(args.output_file, 'w')
 outfile.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-outfile.write('<osm version="0.6" generator="planet-notes-dump">\n')
+outfile.write('<osm-notes>\n')
 
 conn = psycopg2.connect(host=args.host, port=args.port, user=args.user, password=args.password, database=args.database)
 note_cursor = conn.cursor()
@@ -65,5 +65,5 @@ print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note
 
 conn.close()
 
-outfile.write('</osm>\n')
+outfile.write('</osm-notes>\n')
 outfile.close()
