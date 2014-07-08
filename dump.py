@@ -45,7 +45,7 @@ for note in note_cursor:
                               WHERE note_id = %s ORDER BY created_at""", [note[0]])
     for comment in comment_cursor:
         comment_elem = etree.SubElement(note_elem, "comment", {
-            'date': comment[0].strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'timestamp': comment[0].strftime('%Y-%m-%dT%H:%M:%SZ'),
             'action': comment[4],
         })
 
