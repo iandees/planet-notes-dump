@@ -54,8 +54,7 @@ for note in note_cursor:
             comment_elem.set('uid', str(comment[1]))
             comment_elem.set('user', comment[2])
 
-        if comment[3] is not None:
-            comment_elem.text = comment[3]
+        comment_elem.text = comment[3]
 
     outfile.write(etree.tostring(note_elem, encoding='utf8', pretty_print=True))
 
