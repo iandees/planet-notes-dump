@@ -1,4 +1,5 @@
 from lxml import etree
+from collections import OrderedDict
 import psycopg2
 import psycopg2.extensions
 import argparse
@@ -29,12 +30,12 @@ note_cursor.execute("""SELECT id,latitude,longitude,created_at,status,closed_at
                        WHERE status != 'hidden' AND updated_at > %s
                        ORDER BY id ASC""", [args.since])
 for note in note_cursor:
-    note_elem = etree.Element("note", {
-        'lat': '%0.7f' % (note[1] / 10000000.),
-        'lon': '%0.7f' % (note[2] / 10000000.),
-        'id': str(note[0]),
-        'created_at': note[3].strftime('%Y-%m-%dT%H:%M:%SZ'),
-    })
+    note_elem = etree.Element("note", OrderedDict([
+        ('id', str(note[0])),
+        ('lat', '%0.7f' % (note[1] / 10000000.)),
+        ('lon', '%0.7f' % (note[2] / 10000000.)),
+        ('created_at', note[3].strftime('%Y-%m-%dT%H:%M:%SZ')),
+    ]))
 
     if note[4] == 'closed':
         note_elem.set('closed_at', note[5].strftime('%Y-%m-%dT%H:%M:%SZ'))
@@ -44,10 +45,10 @@ for note in note_cursor:
                               FULL OUTER JOIN users ON (note_comments.author_id=users.id)
                               WHERE note_id = %s ORDER BY created_at""", [note[0]])
     for comment in comment_cursor:
-        comment_elem = etree.SubElement(note_elem, "comment", {
-            'timestamp': comment[0].strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'action': comment[4],
-        })
+        comment_elem = etree.SubElement(note_elem, "comment", OrderedDict([
+            ('action', comment[4]),
+            ('timestamp', comment[0].strftime('%Y-%m-%dT%H:%M:%SZ')),
+        ]))
 
         if comment[1]:
             comment_elem.set('uid', str(comment[1]))
