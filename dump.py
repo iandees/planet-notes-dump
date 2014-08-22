@@ -14,6 +14,7 @@ parser.add_argument('--port', help='Postgres port to connect to.', default=5432)
 parser.add_argument('--user', help='Postgres username to use when connecting to the database.', default='openstreetmap')
 parser.add_argument('--password', help='Postgres password to use when connecting to the database.', default='openstreetmap')
 parser.add_argument('--since', help='A datetime to retrieve notes since. Allows incremental dumps.', default='2000-01-01 00:00:00Z')
+parser.add_argument('-q', '--quiet', help='Be quiet.', action='store_true')
 
 args = parser.parse_args()
 
@@ -58,10 +59,11 @@ for note in note_cursor:
 
     outfile.write(etree.tostring(note_elem, encoding='utf8', pretty_print=True))
 
-    if note_cursor.rownumber % 100 == 0:
+    if not args.quiet and note_cursor.rownumber % 100 == 0:
         print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note_cursor.rowcount)
 
-print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note_cursor.rowcount)
+if not args.quiet:
+  print "Wrote out note %6d. (%6d of %6d)" % (note[0], note_cursor.rownumber, note_cursor.rowcount)
 
 conn.close()
 
